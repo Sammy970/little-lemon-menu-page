@@ -45,13 +45,24 @@ export default function App() {
     // The category field comes as an object with a property called "title". You just need to get the title value and set it under the key "category".
     // So the server response should be slighly transformed in this function (hint: map function) to flatten out each menu item in the array,
     try {
+      // console.log("Hello")
       const response = await fetch(API_URL);
       const json = await response.json();
-
-      return json.menu.map(({id, title, price, category}) => ({
-        // console.log(item);
-        id, title, price, category: category.title,
+      return json.menu.map(({ id, title, price, category }) => ({
+        id,
+        title,
+        price,
+        category: category['title'],
       }));
+      // console.log(data);
+
+      // return json.menu.map(({ id, title, price, category }) => ({
+      //   // console.log(item);
+      //   id,
+      //   title,
+      //   price,
+      //   category: category.title,
+      // }));
     } catch (error) {
       console.error(error);
     }
@@ -66,14 +77,19 @@ export default function App() {
         // The application only fetches the menu data once from a remote URL
         // and then stores it into a SQLite database.
         // After that, every application restart loads the menu from the database
+
+        // console.log(menuItems.length);
         if (!menuItems.length) {
           const menuItems = await fetchData();
-          // console.log(menuItems);
-          await saveMenuItems(menuItems);
+          console.log('Hello samyak');
+          saveMenuItems(menuItems);
         }
 
+        menuItems = await fetchData();
+
         const sectionListData = getSectionListData(menuItems);
-        setData(sectionListData);
+        // console.log(sectionListData);
+        setData(sectionListData); 
       } catch (e) {
         // Handle error
         Alert.alert(e.message);
