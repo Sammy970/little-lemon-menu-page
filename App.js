@@ -15,6 +15,7 @@ import {
   getMenuItems,
   saveMenuItems,
   filterByQueryAndCategories,
+  test,
 } from './database';
 import Filters from './components/Filters';
 import { getSectionListData, useUpdateEffect } from './utils';
@@ -39,11 +40,6 @@ export default function App() {
   );
 
   const fetchData = async () => {
-    // 1. Implement this function
-
-    // Fetch the menu from the API_URL endpoint. You can visit the API_URL in your browser to inspect the data returned
-    // The category field comes as an object with a property called "title". You just need to get the title value and set it under the key "category".
-    // So the server response should be slighly transformed in this function (hint: map function) to flatten out each menu item in the array,
     try {
       // console.log("Hello")
       const response = await fetch(API_URL);
@@ -54,15 +50,6 @@ export default function App() {
         price,
         category: category['title'],
       }));
-      // console.log(data);
-
-      // return json.menu.map(({ id, title, price, category }) => ({
-      //   // console.log(item);
-      //   id,
-      //   title,
-      //   price,
-      //   category: category.title,
-      // }));
     } catch (error) {
       console.error(error);
     }
@@ -74,22 +61,24 @@ export default function App() {
         await createTable();
         let menuItems = await getMenuItems();
 
+        // console.log(menuItems.length);
+
         // The application only fetches the menu data once from a remote URL
         // and then stores it into a SQLite database.
         // After that, every application restart loads the menu from the database
 
         // console.log(menuItems.length);
         if (!menuItems.length) {
-          const menuItems = await fetchData();
-          console.log('Hello samyak');
+          menuItems = await fetchData();
+          // console.log('Hello samyak');
           saveMenuItems(menuItems);
         }
 
-        menuItems = await fetchData();
+        // menuItems = await fetchData();
 
         const sectionListData = getSectionListData(menuItems);
         // console.log(sectionListData);
-        setData(sectionListData); 
+        setData(sectionListData);
       } catch (e) {
         // Handle error
         Alert.alert(e.message);
@@ -111,7 +100,9 @@ export default function App() {
           query,
           activeCategories
         );
+        // console.log('filterByQueryAndCategories: ', menuItems);
         const sectionListData = getSectionListData(menuItems);
+        // console.log('section: ', sectionListData);
         setData(sectionListData);
       } catch (e) {
         Alert.alert(e.message);

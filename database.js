@@ -29,7 +29,7 @@ export async function getMenuItems() {
 
 export function saveMenuItems(menuItems) {
   try {
-    console.log(menuItems);
+    // console.log('I am ');
     db.transaction((tx) => {
       menuItems.map((item) => {
         let currentMenuItem = [item.id, item.title, item.price, item.category];
@@ -37,7 +37,7 @@ export function saveMenuItems(menuItems) {
           'insert into menuitems (uuid, title,price,category) values(?, ?, ?, ?)',
           currentMenuItem
         );
-        console.log('insertado:', currentMenuItem);
+        // console.log('insertado:', currentMenuItem);
       });
     });
   } catch (error) {
@@ -65,8 +65,36 @@ export function saveMenuItems(menuItems) {
  * even though the query 'a' it's a substring of 'salad', so the combination of the two filters should be linked with the AND keyword
  *
  */
+
+
 export async function filterByQueryAndCategories(query, activeCategories) {
+  // console.log('query: ', query)
+  // console.log('activeCategories: ', activeCategories)
+  // console.log('final query', `select * from menuitems WHERE category in (${activeCategories.map(cat => `'${cat}'`)}) AND title LIKE '%${query}%'`)
   return new Promise((resolve, reject) => {
-    resolve(SECTION_LIST_MOCK_DATA);
+    db.transaction((tx) => {
+      tx.executeSql(
+        `select * from menuitems WHERE category in (${activeCategories.map(
+          (cat) => `'${cat}'`
+        )}) AND title LIKE '%${query}%'`,
+        [],
+        (_, { rows }) => {
+          resolve(rows._array);
+        }
+      );
+    });
+  });
+}
+
+export function test() {
+  db.transaction((tx) => {
+    tx.executeSql('SELECT * FROM menuitems', [], (txObj, { rows }) => {
+      const len = rows.length;
+      // console.log(len);
+      for (let i = 0; i < len; i++) {
+        const row = rows.item(i);
+        console.log(row);
+      }
+    });
   });
 }
